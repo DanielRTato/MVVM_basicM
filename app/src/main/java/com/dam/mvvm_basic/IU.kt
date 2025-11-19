@@ -35,6 +35,8 @@ fun IU(miViewModel: MyViewModel) {
     // para que sea mas facil la etiqueta del log
     // val TAG_LOG = "miDebug"
 
+    val progreso by miViewModel._progreso.collectAsState()
+
     // botones en horizontal
     Column(
         modifier= Modifier.fillMaxWidth().fillMaxHeight().padding(20.dp),
@@ -56,7 +58,14 @@ fun IU(miViewModel: MyViewModel) {
                 // creo un boton amarillo
                 Boton(miViewModel, Colores.CLASE_AMARILLO)
             }
+            Row() {
+                if (miViewModel.estadoActual.collectAsState().value == Estados.ERROR) { // si el estado es ERROR mostramos mensaje de game over
+                    Text(text = "Has fallado 3 veces. GAME OVER.", fontSize = 16.sp)
+                }
+            }
         }
+
+        Text("Progreso: $progreso%") // muestra la simulacion de progreso
         // creao boton Start
         Boton_Start(miViewModel, Colores.CLASE_START)
     }

@@ -17,6 +17,9 @@ class MyViewModel(): ViewModel() {
     // patron de diseño observer
     val estadoActual = MutableStateFlow(Estados.INICIO)
 
+    val _fallos = MutableStateFlow(0) // observable de los fallos
+    val _progreso = MutableStateFlow(0) // observable del progreso
+
     // este va a ser nuestra lista para la secuencia random
     // usamos mutable, ya que la queremos modificar
     var _numbers = MutableStateFlow(0)
@@ -31,11 +34,20 @@ class MyViewModel(): ViewModel() {
      * crear entero random
      */
     fun crearRandom() {
-        // cambiamos estado, por lo tanto la IU se actualiza
-        estadoActual.value = Estados.GENERANDO
-        _numbers.value = (0..3).random()
-        Log.d(TAG_LOG, "creamos random ${_numbers.value} - Estado: ${estadoActual.value}")
-        actualizarNumero(_numbers.value)
+        viewModelScope.launch {
+            estadoActual.value = Estados.GENERANDO
+
+            for (i in 0..100 step 10) { // simulamos progreso con una corutina
+                _progreso.value = i
+                delay(100)
+            }
+
+            // cambiamos estado, por lo tanto la IU se actualiza
+            estadoActual.value = Estados.GENERANDO
+            _numbers.value = (0..3).random()
+            Log.d(TAG_LOG, "creamos random ${_numbers.value} - Estado: ${estadoActual.value}")
+            actualizarNumero(_numbers.value)
+        }
     }
 
     fun actualizarNumero(numero: Int) {
@@ -56,16 +68,26 @@ class MyViewModel(): ViewModel() {
         estadosAuxiliares()
 
         Log.d(TAG_LOG, "comprobamos - Estado: ${estadoActual.value}")
-        return if (ordinal == Datos.numero) {
+
+         if (ordinal == Datos.numero) {
+            _fallos.value = 0 // reseteamos fallos si acierta
             Log.d(TAG_LOG, "es correcto")
             estadoActual.value = Estados.INICIO
             Log.d(TAG_LOG, "GANAMOS - Estado: ${estadoActual.value}")
-            true
+            return true
         } else {
-            Log.d(TAG_LOG, "no es correcto")
+            _fallos.value ++ // incremento fallos
+
+             if (_fallos.value >= 3) {
+                 Log.d(TAG_LOG, "3 fallos, pasamos a estado ERROR")
+                 estadoActual.value = Estados.ERROR
+                 return false
+
+             }
+            Log.d(TAG_LOG, "no es correcto, fallos: ${_fallos.value}")
             estadoActual.value = Estados.ADIVINANDO
             Log.d(TAG_LOG, "otro intento - Estado: ${estadoActual.value}")
-            false
+             return false
         }
     }
 

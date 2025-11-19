@@ -34,7 +34,8 @@ enum class Colores(val color: Color, val color_suave: Color = Color.Transparent,
 enum class Estados(val start_activo: Boolean, val boton_activo: Boolean) {
     INICIO(start_activo = true, boton_activo = false),
     GENERANDO(start_activo = false, boton_activo = false),
-    ADIVINANDO(start_activo = false, boton_activo = true)
+    ADIVINANDO(start_activo = false, boton_activo = true),
+    ERROR(start_activo = true, boton_activo = false), // nuevo estado, salta al fallar 3 veces
 }
 
 /**

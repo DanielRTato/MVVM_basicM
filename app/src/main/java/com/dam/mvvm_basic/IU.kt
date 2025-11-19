@@ -20,11 +20,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalLifecycleOwner
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
+import androidx.compose.runtime.collectAsState
 
 /**
  * Interfaz de usuario
@@ -70,12 +69,8 @@ fun Boton(miViewModel: MyViewModel, enum_color: Colores) {
     val TAG_LOG = "miDebug"
 
     // variable para el estado del boton
-    var _activo by remember { mutableStateOf(miViewModel.estadoLiveData.value!!.boton_activo) }
+    var _activo = miViewModel.estadoActual.collectAsState().value.boton_activo
 
-    miViewModel.estadoLiveData.observe(LocalLifecycleOwner.current) {
-        // Log.d(TAG_LOG, "Observer Estado: ${miViewModel.estadoLiveData.value!!.name}")
-        _activo = miViewModel.estadoLiveData.value!!.boton_activo
-    }
 
     // separador entre botones
     Spacer(modifier = Modifier.size(10.dp))
@@ -103,16 +98,10 @@ fun Boton_Start(miViewModel: MyViewModel, enum_color: Colores) {
     val TAG_LOG = "miDebug"
 
     // variable para el estado del boton
-    var _activo by remember { mutableStateOf(miViewModel.estadoLiveData.value!!.start_activo) }
+    var _activo = miViewModel.estadoActual.collectAsState().value.start_activo
 
     // variable para el color del boton usado en el LaunchedEffect
     var _color by remember { mutableStateOf(enum_color.color) }
-
-
-    miViewModel.estadoLiveData.observe(LocalLifecycleOwner.current) {
-        // Log.d(TAG_LOG, "Oserver Estado: ${miViewModel.estadoLiveData.value!!.name}")
-        _activo = miViewModel.estadoLiveData.value!!.start_activo
-    }
 
     // cremos el efecto de parpadear con Launchedffect
     // mientras el estado es INICIO el boton start parpadea
@@ -137,7 +126,7 @@ fun Boton_Start(miViewModel: MyViewModel, enum_color: Colores) {
         // colors =  ButtonDefaults.buttonColors(enum_color.color),
         colors = ButtonDefaults.buttonColors(_color),
         onClick = {
-            Log.d(TAG_LOG, "Dentro del Start - Estado: ${miViewModel.estadoLiveData.value!!.name}")
+            Log.d(TAG_LOG, "Dentro del Start - Estado: ${miViewModel.estadoActual.value.name}")
             miViewModel.crearRandom()
         },
         modifier = Modifier
@@ -146,14 +135,4 @@ fun Boton_Start(miViewModel: MyViewModel, enum_color: Colores) {
         // utilizamos el texto del enum
         Text(text = enum_color.txt, fontSize = 10.sp)
     }
-}
-
-/**
- * Preview de la interfaz de usuario
- */
-
-@Preview(showBackground = true)
-@Composable
-fun IUPreview() {
-    IU(MyViewModel())
 }

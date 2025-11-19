@@ -1,11 +1,10 @@
 package com.dam.mvvm_basic
 
 import android.util.Log
-import androidx.compose.runtime.mutableStateOf
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
 class MyViewModel(): ViewModel() {
@@ -16,16 +15,16 @@ class MyViewModel(): ViewModel() {
     // estados del juego
     // usamos LiveData para que la IU se actualice
     // patron de diseño observer
-    val estadoLiveData: MutableLiveData<Estados?> = MutableLiveData(Estados.INICIO)
+    val estadoActual = MutableStateFlow(Estados.INICIO)
 
     // este va a ser nuestra lista para la secuencia random
     // usamos mutable, ya que la queremos modificar
-    var _numbers = mutableStateOf(0)
+    var _numbers = MutableStateFlow(0)
 
     // inicializamos variables cuando instanciamos
     init {
         // estado inicial
-        Log.d(TAG_LOG, "Inicializamos ViewModel - Estado: ${estadoLiveData.value}")
+        Log.d(TAG_LOG, "Inicializamos ViewModel - Estado: ${estadoActual.value}")
     }
 
     /**
@@ -33,17 +32,17 @@ class MyViewModel(): ViewModel() {
      */
     fun crearRandom() {
         // cambiamos estado, por lo tanto la IU se actualiza
-        estadoLiveData.value = Estados.GENERANDO
+        estadoActual.value = Estados.GENERANDO
         _numbers.value = (0..3).random()
-        Log.d(TAG_LOG, "creamos random ${_numbers.value} - Estado: ${estadoLiveData.value}")
+        Log.d(TAG_LOG, "creamos random ${_numbers.value} - Estado: ${estadoActual.value}")
         actualizarNumero(_numbers.value)
     }
 
     fun actualizarNumero(numero: Int) {
-        Log.d(TAG_LOG, "actualizamos numero en Datos - Estado: ${estadoLiveData.value}")
+        Log.d(TAG_LOG, "actualizamos numero en Datos - Estado: ${estadoActual.value}")
         Datos.numero = numero
         // cambiamos estado, por lo tanto la IU se actualiza
-        estadoLiveData.value = Estados.ADIVINANDO
+        estadoActual.value = Estados.ADIVINANDO
     }
 
     /**
@@ -56,16 +55,16 @@ class MyViewModel(): ViewModel() {
         // mientras comprobamos, lanzamos estados auxiliares en paralelo
         estadosAuxiliares()
 
-        Log.d(TAG_LOG, "comprobamos - Estado: ${estadoLiveData.value}")
+        Log.d(TAG_LOG, "comprobamos - Estado: ${estadoActual.value}")
         return if (ordinal == Datos.numero) {
             Log.d(TAG_LOG, "es correcto")
-            estadoLiveData.value = Estados.INICIO
-            Log.d(TAG_LOG, "GANAMOS - Estado: ${estadoLiveData.value}")
+            estadoActual.value = Estados.INICIO
+            Log.d(TAG_LOG, "GANAMOS - Estado: ${estadoActual.value}")
             true
         } else {
             Log.d(TAG_LOG, "no es correcto")
-            estadoLiveData.value = Estados.ADIVINANDO
-            Log.d(TAG_LOG, "otro intento - Estado: ${estadoLiveData.value}")
+            estadoActual.value = Estados.ADIVINANDO
+            Log.d(TAG_LOG, "otro intento - Estado: ${estadoActual.value}")
             false
         }
     }

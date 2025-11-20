@@ -89,6 +89,7 @@ fun Boton(miViewModel: MyViewModel, enum_color: Colores) {
         // utilizamos el color del enum
         colors =  ButtonDefaults.buttonColors(enum_color.color),
         onClick = {
+            enum_color.function() // llamamos a la funcion del enum
             Log.d(TAG_LOG, "Dentro del boton: ${enum_color.ordinal}")
             miViewModel.comprobar(enum_color.ordinal)
                   },

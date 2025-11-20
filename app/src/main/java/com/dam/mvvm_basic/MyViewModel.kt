@@ -81,6 +81,7 @@ class MyViewModel(): ViewModel() {
              if (_fallos.value >= 3) {
                  Log.d(TAG_LOG, "3 fallos, pasamos a estado ERROR")
                  estadoActual.value = Estados.ERROR
+                 _fallos.value = 0 // reseteamos fallos al entrar en error
                  return false
 
              }
@@ -109,5 +110,15 @@ class MyViewModel(): ViewModel() {
             Log.d(TAG_LOG, "estado (corutina): ${estadoAux}")
             delay(1500)
         }
+    }
+
+    // funcion para resetear el juego
+    fun resetear() {
+        Log.d(TAG_LOG, "Resteando el juego, ESTADO - ${estadoActual.value}")
+        estadoActual.value = Estados.INICIO
+        _fallos.value = 0
+        _progreso.value = 0
+        Log.d(TAG_LOG, "Juego reiniciado, ESTADO - ${estadoActual.value}")
+
     }
 }

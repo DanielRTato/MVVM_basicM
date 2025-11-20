@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.materialIcon
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
@@ -24,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
 import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 /**
  * Interfaz de usuario
@@ -57,7 +59,10 @@ fun IU(miViewModel: MyViewModel) {
 
                 // creo un boton amarillo
                 Boton(miViewModel, Colores.CLASE_AMARILLO)
+
+
             }
+
             Row() {
                 if (miViewModel.estadoActual.collectAsState().value == Estados.ERROR) { // si el estado es ERROR mostramos mensaje de game over
                     Text(text = "Has fallado 3 veces. GAME OVER.", fontSize = 16.sp)
@@ -68,6 +73,12 @@ fun IU(miViewModel: MyViewModel) {
         Text("Progreso: $progreso%") // muestra la simulacion de progreso
         // creao boton Start
         Boton_Start(miViewModel, Colores.CLASE_START)
+
+        Button(
+            onClick = { miViewModel.resetear() } // Boton para resetear el juego
+        ) {
+            Text("Reset")
+        }
     }
 }
 

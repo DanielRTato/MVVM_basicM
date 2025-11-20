@@ -139,6 +139,7 @@ class MyViewModel(): ViewModel() {
         estadoActual.value = Estados.INICIO
         _fallos.value = 0
         _progreso.value = 0
+        cuentaAtras.value = 5
         Log.d(TAG_LOG, "Juego reiniciado, ESTADO - ${estadoActual.value}")
 
     }

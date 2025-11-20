@@ -24,6 +24,8 @@ class MyViewModel(): ViewModel() {
     // usamos mutable, ya que la queremos modificar
     var _numbers = MutableStateFlow(0)
 
+    val cuentaAtras = MutableStateFlow(5) // observable para la cuenta atrás
+
     // inicializamos variables cuando instanciamos
     init {
         // estado inicial
@@ -35,15 +37,13 @@ class MyViewModel(): ViewModel() {
      */
     fun crearRandom() {
         viewModelScope.launch {
-            estadoActual.value = Estados.GENERANDO
+            estadoActual.value = Estados.GENERANDO // cambiamos estado, por lo tanto la IU se actualiza
 
             for (i in 0..100 step 10) { // simulamos progreso con una corutina
                 _progreso.value = i
                 delay(100)
             }
 
-            // cambiamos estado, por lo tanto la IU se actualiza
-            estadoActual.value = Estados.GENERANDO
             _numbers.value = (0..3).random()
             Log.d(TAG_LOG, "creamos random ${_numbers.value} - Estado: ${estadoActual.value}")
             actualizarNumero(_numbers.value)
@@ -55,6 +55,7 @@ class MyViewModel(): ViewModel() {
         Datos.numero = numero
         // cambiamos estado, por lo tanto la IU se actualiza
         estadoActual.value = Estados.ADIVINANDO
+        cuentaAtras() //  empieza la cuenta atrás
     }
 
     /**
@@ -71,6 +72,7 @@ class MyViewModel(): ViewModel() {
 
          if (ordinal == Datos.numero) {
             _fallos.value = 0 // reseteamos fallos si acierta
+             cuentaAtras.value = 5    // no me olvido de resetar la cuenta atrás
             Log.d(TAG_LOG, "es correcto")
             estadoActual.value = Estados.INICIO
             Log.d(TAG_LOG, "GANAMOS - Estado: ${estadoActual.value}")
@@ -109,6 +111,25 @@ class MyViewModel(): ViewModel() {
             estadoAux = EstadosAuxiliares.AUX3
             Log.d(TAG_LOG, "estado (corutina): ${estadoAux}")
             delay(1500)
+        }
+    }
+
+    // funcion para iniciar la cuenta atrás
+    fun cuentaAtras() {
+        viewModelScope.launch {
+
+            for (i in EstadosAuxiliares.values().reversed()) {
+                cuentaAtras.value = i.segundo
+                Log.d(TAG_LOG, "Cuenta atrás: ${cuentaAtras.value}")
+                delay(1000)
+
+                // Si el jugador acierta o reinicia el juego, salimos de la cuenta atrás
+                if (estadoActual.value == Estados.INICIO) {
+                    return@launch // si el estado cambia a INICIO, salimos de la cuenta atrás
+                }
+            }
+            estadoActual.value = Estados.INICIO // si llega a 0, volvemos al estado INICIO
+            Log.d(TAG_LOG, "Cuenta atrás finalizada - Estado: ${estadoActual.value}")
         }
     }
 

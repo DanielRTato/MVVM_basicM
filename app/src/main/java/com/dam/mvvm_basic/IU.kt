@@ -38,6 +38,7 @@ fun IU(miViewModel: MyViewModel) {
     // val TAG_LOG = "miDebug"
 
     val progreso by miViewModel._progreso.collectAsState()
+    val cuentaAtras by miViewModel.cuentaAtras.collectAsState()
 
     // botones en horizontal
     Column(
@@ -71,6 +72,9 @@ fun IU(miViewModel: MyViewModel) {
         }
 
         Text("Progreso: $progreso%") // muestra la simulacion de progreso
+
+        Text(text = "Cuenta atrás: $cuentaAtras") // muestra la cuenta atrás
+
         // creao boton Start
         Boton_Start(miViewModel, Colores.CLASE_START)
 
